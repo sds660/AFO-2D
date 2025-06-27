@@ -1,0 +1,18 @@
+/*Imported destroy font from:
+http://www.fontsquirrel.com/contact
+Free for distrubution & use
+*/
+@font-face {
+      font-family: 'destroyregular';
+      src: url('external/DESTROY_-webfont.eot');
+      src: url('external/DESTROY_-webfont.eot?#iefix') format('embedded-opentype'), 
+      url('external/DESTROY_-webfont.woff') format('woff'), 
+      url('external/DESTROY_-webfont.ttf') format('truetype'), 
+      url('external/DESTROY_-webfont.svg#destroyregular') format('svg');
+      font-weight: normal;
+      font-style: normal;
+}
+
+.destroy {
+      font-family: 'destroyregular';
+}

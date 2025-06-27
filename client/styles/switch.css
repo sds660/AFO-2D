@@ -1,0 +1,82 @@
+/* The switch - the box around the slider */
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 75px;
+	height: 34px;
+	margin-left: 20px;
+	margin-right: 5px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+	display:none;
+}
+  
+/* The slider */
+.slider {
+	border-radius: 34px;
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	-webkit-transition: .4s;
+    transition: .4s;
+    font-family: "Times New Roman", Times, serif;
+}
+  
+.slider:before {
+	border-radius: 50%;
+	position: absolute;
+	content: "";
+	height: 26px;
+	width: 26px;
+	left: 4px;
+	bottom: 4px;
+	background-color: white;
+	-webkit-transition: .4s;
+	transition: .4s;
+}
+  
+input:checked + .slider {
+	background-color: grey;
+}
+  
+input:focus + .slider {
+	box-shadow: 0 0 1px grey;
+}
+  
+input:checked + .slider:before {
+	-webkit-transform: translateX(41px);
+	-ms-transform: translateX(41px);
+	transform: translateX(41px);
+}
+  
+.switch_text {
+	display: initial;
+	position: absolute;
+	width: 41px;
+	top: 6px;
+	right: 4px;
+}
+
+.on_text {
+	display:	none;
+}
+.off_text {
+	display:	block;
+}
+input:checked + .slider .on_text {
+	display:	block;
+}
+input:checked + .slider .off_text {
+	display:	none;
+}
+
+input:checked + .slider .switch_text {
+	left: 4px;
+	right: initial;
+}

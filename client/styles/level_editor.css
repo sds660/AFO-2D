@@ -1,0 +1,298 @@
+html {
+	min-height:	100%;
+}
+
+body {
+	height:	100vh;
+	margin:	0px;
+}
+
+img {
+	padding: 5px;
+}
+
+#levelEditorContent {
+	width: 1280px;
+	height: 720px;
+	display: none;
+}
+
+#level_editor {
+	background-color: white;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+	background-attachment: fixed;
+	border:	solid black 1px;
+	height:	100%;
+	position: relative;
+	overflow: hidden;
+}
+
+#level_menu_button {
+	display: none;
+	color: #fff;
+	text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+	position: absolute;
+	top: 10px;
+	left: 1225px;
+	cursor: pointer;
+}
+
+#menu {
+	position: fixed;
+	top: 0;
+	max-width: 1280px;
+	width: 100%;
+	height: 100px;
+	z-index: 98;
+}
+
+#top_menu_space {
+	height:	100px;
+}
+
+#menu_button {
+	float: left;
+	cursor: pointer;
+	width: 10%;
+	text-align:	center;
+}
+
+#droppable_remove {
+	float:	right;
+	height:	100px;
+	width:	10%;
+	opacity: 0.8;
+	text-align:	center;
+}
+
+.top_menu {
+	width: 80%;
+	height:	100px;
+	background-color: rgba(66, 66, 66, 0.8);
+	margin:	0 auto;
+	border-radius: 0px 0px 20px 20px;
+}
+
+#top_menu_zoom {
+	display: none;
+	position: absolute;
+	top: 0px;
+	left: 10%;
+	z-index: 100;
+	text-align: center;
+	color: #888;
+}
+
+#top_menu>div{
+	padding: 10px 20px 0px 20px;
+}
+
+#terrain_main_entity {
+	background-image: url("../assets/terrain/dirt/Tiles/Tile2.png");
+    background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+}
+
+#enemy_main_entity {
+	background-image: url("../assets/enemies/snakes.png");
+    background-position: 50% -1%;
+    background-repeat: no-repeat;
+	background-size: 350%;
+}
+
+#item_main_entity {
+	background-image: url("../assets/items/gems.png");
+    background-position: 86% 6%;
+}
+
+#character_main_entity {
+	background-image: url("../assets/menuImages/archer-icon.png");
+    background-repeat: no-repeat;
+	background-size: contain;
+	background-position-x: center;
+}
+
+#background_main_entity {
+	background-image: url("../assets/Backgrounds/background-icon.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+	background-size: cover;
+}
+
+#sound_main_entity {
+	background-image: url("../assets/music-icon.jpg");
+    background-repeat: no-repeat;
+	background-position: center;
+	background-size: 100%;
+}
+
+.terrain_entity {
+	background-size: contain;
+	margin:	0 auto 5px auto;
+	z-index: 10;
+}
+
+.enemy_entity {
+	margin: 0 auto;
+	z-index: 12;
+}
+
+.item_entity {
+	margin: 0 auto; 
+	background-repeat: no-repeat;
+	z-index: 11;
+}
+
+.character_entity {
+	margin: 0 auto;
+	height: 70px;
+	width: 50px;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.main_entity {
+    background-color: #aaa;
+    height:	60px;
+    width:	60px;
+	border-radius:	10px;
+    border:	solid #ccc 4px;
+	border-style:	outset;
+	margin:	0px 5px;
+	cursor:	pointer;
+}
+
+.main_entity:active {
+	border-style: inset;
+}
+
+#new_background_outer_div {
+	height: 720px;
+	width:	1280px;
+	position: absolute;
+	left: 0;
+	top: 100px;
+}
+
+#new_background_div {
+	background-size: cover;
+	height: 620px;
+	width:	1280px;
+}
+
+#background_div {
+	min-height: 620px;
+	width: 5000px;
+	height: 2000px;
+	zoom: 1;
+}
+
+#droppable_grid {
+	background:	repeating-linear-gradient(
+			180deg,transparent,transparent 24px, #ccc 25px),
+		repeating-linear-gradient(
+			90deg,transparent,transparent 24px,#ccc 25px);
+    min-height: 620px;
+	position: relative;
+	width: 5000px;
+	height: 2000px;
+}
+
+.dialog_menu {
+	display: none;
+	text-align: center;
+}
+
+#editor_menu_dialog input {
+	width: 70%;
+	padding: 5px;
+	margin:	5px;
+	border-radius: 5px;
+}
+
+#zoom_dialog {
+	display: none;
+	text-align: center;
+}
+
+#graphicChoiceDiv {
+	width:		200px;
+	height:		70px;
+	position:	absolute;
+	overflow-x: auto;
+	overflow-y: hidden;
+	border:		solid #424242 2px;
+	border-radius:	5px;
+	background-color:	#424242; 
+	display:	none;
+	z-index:	999;
+}
+
+#spawnCharacter {
+	position:	absolute;
+	top:		400px;
+	left:		200px;
+	background-size:	80px;
+	z-index: 	20;
+}
+
+.menu_header {
+	color:	white;
+	font-size:	larger;
+	padding-bottom: 5px;
+}
+
+#load_lvl_textbox, #load_button, #save_lvl_textbox, #save_button {
+	display: none;
+}
+
+.backgroundCheckbox, .soundsCheckbox, .characterCheckbox {
+	height:		55px;
+	width:		55px;
+	padding:	15px;
+	left:		15px;
+	display:	none;
+	position:	absolute;
+}
+
+.check_entity {
+	height:	75px;
+	width:	75px;
+	padding:0px;
+}
+
+.entity_menu {
+	display:	none;
+	width:		110px;
+	background-color: rgba(66, 66, 66, 0.8);
+	position:	fixed;
+	top:		100px;
+	left:		0px;
+	min-height:	500px;
+	text-align:	center;
+	border-radius:	0px 20px 20px 0px;
+	overflow:	unset;
+	z-index: 30;
+}
+
+.dialog_button {
+	width:	75%;
+	margin:	5px;
+	border-radius:	5px;
+	border-width:	5px;
+	border-color:	#555;
+      background-color:	#222;
+	color:	antiquewhite;
+	font-size: 1em;
+}
+
+.no-header-dialog .ui-dialog-titlebar {
+	display:	none;
+}
+
+.ui-draggable {
+	padding:	0px;
+}

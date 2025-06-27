@@ -1,0 +1,13 @@
+#canvas_background {
+    background-size: cover;
+    position: 	absolute;
+	top: 		0px;
+    left: 		0px;
+    height:     722px;
+    width:      1282px;
+    z-index:    -1;
+}
+#ctx{
+      position: absolute;
+      
+}

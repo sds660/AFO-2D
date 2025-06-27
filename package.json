@@ -1,0 +1,20 @@
+{
+      "name": "cs4770",
+      "version": "1.0.0",
+      "description": "",
+      "main": "app.js",
+      "dependencies": {
+            "express": "^4.16.3",
+            "mongod": "^2.0.0",
+            "mongojs": "^2.5.0",
+            "nconf": "^0.10.0",
+            "socket.io": "^2.0.4"
+      },
+      "devDependencies": {},
+      "scripts": {
+            "start": "node app.js",
+            "test": "echo \"Error: no test specified\" && exit 1"
+      },
+      "author": "",
+      "license": "ISC"
+}

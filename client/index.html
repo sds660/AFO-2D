@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <title>All For One</title>
+      <script>
+            var WIDTH = 1280;
+            var HEIGHT = 720;
+      </script>
+      <!-- Jquery UI -->
+      <script src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+      <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+      <!-- Jquery UI touch drag extension -->
+      <script src="js/external/jquery.ui.touch-punch.min.js"></script>
+      <!--DB socket -->
+      <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+      <!-- Our JS Files -->
+      <script src="js/login.js"></script>
+      <script src="js/users.js" type="text/javascript"></script>
+      <script src="js/level.js" type="text/javascript"></script>
+      <script src="js/entity.js" type="text/javascript"></script>
+      <script src="js/jsonReadWrite-bundled.js" type="text/javascript"></script>
+      <script src="js/preloadedAssets.js" type="text/javascript"></script>
+      <script src="js/standardEntities.js" type="text/javascript"></script>
+      <script src="js/engine.js"></script>
+      <script src="js/interface.js"></script>
+      <script src="js/settings.js"></script>
+      <script src="js/selectLevel.js"></script>
+      <script src="js/levelEditor.js" type="text/javascript"></script>
+      <script src="js/external/jquery-loader.js" type="text/javascript"></script>
+
+      <!-- Styles -->
+      <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/dot-luv/jquery-ui.css" />
+      <!-- <link rel="stylesheet" href="styles/ext-jquery-ui.css" /> -->
+      <link rel="stylesheet" href="styles/level_editor.css">
+      <link rel="stylesheet" href="styles/settings.css">
+      <link rel="stylesheet" href="styles/login.css">
+      <link rel="stylesheet" href="styles/canvas.css">
+      <link rel="stylesheet" href="styles/switch.css">
+      <link rel="stylesheet" href="styles/fonts.css">
+      <link rel="stylesheet" href="styles/selectLevel.css">
+      <link rel="stylesheet" href="styles/pulseButton.css">
+      <link rel="stylesheet" href="styles/external/jqueryLoader.css">
+
+
+</head>
+
+<body>
+      <input style="display:none" type="file" id="levelsFromFile" name="file" onChange="loadLevelsFromFile()">
+
+      <div id="canvas">
+            <div id="canvas_background"></div>
+            <canvas id="ctx" width="1280" height="720" style="border:1px solid #000000;"></canvas>
+
+            <div id="level_menu_button" onclick="openLevelDialog()">
+                  <img id="pauseIMG" src="assets\menuImages\pause.png">
+                  <img id="playIMG" style="display:none;" src="assets\menuImages\playButton.png">
+            </div>
+            <!-- Pause menu Dialog Box -->
+            <div id="level_menu_dialog" class="dialog_menu">
+                  <button id="resume_button" class="dialog_button" onclick="closeLevelDialog()">Resume</button>
+                  <br>
+                  <button id="restart_button" class="dialog_button" onclick="restartGame()">Restart</button>
+                  <br>
+                  <button id="settings_button" class="dialog_button" onclick="showSettings()">Settings</button>
+                  <br>
+                  <button id="exit_button" class="dialog_button" onclick="backToMain()">Exit to Main Menu</button>
+                  <br>
+                  <button id="back_to_editor_button" style="display:none" class="dialog_button" onclick="backToEditor()">Return to Editor</button>
+                  <br>
+            </div>
+            <!-- Game Over Dialog Box -->
+            <div id="game_over_dialog" class="dialog_menu">
+                  <button id="restart_button" class="dialog_button" onclick="restartGame()">Restart</button>
+                  <br>
+                  <button id="exit_button" class="dialog_button" onclick="backToMain()">Exit to Main Menu</button>
+                  <br>
+                  <button id="back_to_editor" style="display:none" class="dialog_button" onclick="backToEditor()">Return to Editor</button>
+                  <br>
+            </div>
+            <!-- Level Completed Dialog Box -->
+            <div id="level_completed_dialog" class="dialog_menu">
+                  <div id="message_completed"></div>
+                  <button id="next_campaign_button" class="dialog_button" style="display:none;" onclick="playNextCmapaign()">Play Next Level</button>
+                  <br>
+                  <button id="restart_button" class="dialog_button" onclick="restartGame()">Play Again</button>
+                  <br>
+                  <button id="exit_button" class="dialog_button" onclick="backToMain()">Return to Main Menu</button>
+                  <br>
+                  <button id="back_to_editor_completed" style="display:none" class="dialog_button" onclick="backToEditor()">Return to Editor</button>
+                  <br>
+                  <button id="publish_button" style="display:none" class="dialog_button" onclick="publishLevel()">Publish Level</button>
+                  <br>
+            </div>
+            <div id="saveMyLevelsButton" class="saveLoad">
+                  <img id="saveIMG" src="assets\menuImages\save.png" onclick="downloadMyLevels()">
+            </div>
+            <div id="openMyLevels" class="saveLoad">
+                  <img id="openIMG" src="assets\menuImages\open.png" onclick="$('#levelsFromFile').click();">
+            </div>
+            <div id="aboutButton" class="saveLoad">
+                  <img id="aboutIMG" src="assets\menuImages\about.png" onclick="showAbout()">
+            </div>
+      </div>
+
+      <!-- myLevels option menu -->
+      <div id="rightclickEdit" class="dropdown-content" oncontextmenu="return false">
+            <a id="rightClickEditOption" href="#edit" onclick="editLevelFromSelectMenu()">Edit</a>
+            <a id="rightClickDelete" href="#delete" onclick="deleteLevel()">Delete</a>
+      </div>
+      <!-- end of myLevels option menu -->
+
+      <script>
+            var ct = document.getElementById("ctx");
+            var ctx = document.getElementById("ctx").getContext("2d");
+            var easterEgg = [];
+            ctx.font = "30px Arial";
+            $(document).ready(function () {
+                  document.body.addEventListener("keydown", function (e) {
+                        keys[e.keyCode] = true;
+                        easterEgg.push(String.fromCharCode(e.keyCode));
+                  });
+
+                  document.body.addEventListener("keyup", function (e) {
+                        keys[e.keyCode] = false;
+                  });
+                  document.body.addEventListener("keydown", function (e) {
+                        if (e.keyCode === 112) {
+                              e.preventDefault();
+                        }
+                  });
+                  document.body.addEventListener("mouseup", function (e) {
+                        // $("#rightclickEdit").hide();
+
+                  });
+            });
+            // document.body.addEventListener("mousemove", checkPos);
+            document.body.addEventListener("mouseup", checkClick);
+      </script>
+      <script src="js/mainMenu.js"></script>
+
+      <!-- login view -->
+      <div id="login_div" class="menuPopup">
+            <div id="header"></div>
+            <div id="login_form">
+                  <table id="login_table">
+                        <tr id="backToLogin">
+                              <td>
+                                    <div style="text-align: left; padding-bottom: 10px" onclick="backToLogin()">Back</div>
+                              </td>
+                        </tr>
+                        <tr id="username">
+                              <td>
+                                    <b>Username: </b>
+                              </td>
+                              <td>
+                                    <input type="text" id="loginUsername" placeholder="Username">
+                              </td>
+                        </tr>
+                        <tr id="password">
+                              <td>
+                                    <b>Password: </b>
+                              </td>
+                              <td>
+                                    <input type="password" id="loginPassword" placeholder="Password">
+                              </td>
+                        </tr>
+                        <tr id="confirmPassword">
+                              <td>
+                                    <b>Confirm Password: </b>
+                              </td>
+                              <td>
+                                    <input type="password" id="loginPasswordConfirm" placeholder="Confirm Password">
+                              </td>
+                        </tr>
+                        <tr id="securityQuestion">
+                              <td>
+                                    <b>Security Question: </b>
+                              </td>
+                              <td>
+                                    <input type="text" id="loginSecurityQuestion" placeholder="Security Question">
+                              </td>
+                        </tr>
+                        <tr id="securityAnswer">
+                              <td>
+                                    <b>Security Answer: </b>
+                              </td>
+                              <td>
+                                    <input type="text" id="loginSecurityAnswer" placeholder="Security Answer">
+                              </td>
+                        </tr>
+                        <tr>
+                              <td colspan="2">
+                                    <div id="message_div"></div>
+                              </td>
+                        </tr>
+                        <tr id="forgotPassword">
+                              <td colspan="2">
+                                    <div id="forgotPasswordBtn" style="cursor:pointer; color:blue" onclick="forgotPasswordView()">Forgot your Password?</div>
+                              </td>
+                        </tr>
+                        <tr id="login">
+                              <td colspan="2">
+                                    <button id="loginBtn" class="dialog_button" onclick="signin()">Login</button>
+                              </td>
+                        </tr>
+                        <tr id="createNewAccount">
+                              <td colspan="2">
+                                    <div id="createNewAcctBtn" style="cursor:pointer; color:blue" onclick="createAccountView()">Create New Account</div>
+                              </td>
+                        </tr>
+                        <tr id="createAccount">
+                              <td colspan="2">
+                                    <button id="createAcctBtn" class="dialog_button" onclick="createAccount()">Create Account</button>
+                              </td>
+                        </tr>
+                        <tr id="resetAccount">
+                              <td colspan="2">
+                                    <button id="resetAcctBtn" class="dialog_button" onclick="resetPassword()">Reset Password</button>
+                              </td>
+                        </tr>
+                        <tr id="guest">
+                              <td colspan="2">
+                                    <button id="guestBtn" class="dialog_button" onclick="guestSignin()">Play as Guest</button>
+                              </td>
+                        </tr>
+                  </table>
+            </div>
+      </div>
+      <!-- End of login view -->
+
+      <!-- settings view -->
+      <div id="settings" class="menuPopup destroy">
+            <div style="font-family:destroyregular;font-size:40px;text-align:center;position:relative">
+                  Game Settings
+            </div>
+            <br>
+            <div id="backgroundMusic" class="destroy" style="font-size:20px;">
+                  <div style="vertical-align: middle;display:inline-block;height:100%;">Background Music</div>
+                  <label class="switch">
+                        <input type="checkbox" id="BackgroundMusicBox">
+                        <span class="slider">
+                              <div class="switch_text on_text">ON</div>
+                              <div class="switch_text off_text">OFF</div>
+                        </span>
+                        <script>
+                              getSettingsValues();
+                        </script>
+                  </label>
+            </div>
+            <br>
+            <div id="soundEffects" class="destroy" style="font-size:20px;">
+                  <div style="vertical-align: middle;display:inline-block;height:100%;">Sound Effects</div>
+                  <label class="switch">
+                        <input type="checkbox" id="soundEffectsBox">
+                        <span class="slider">
+                              <div class="switch_text on_text">ON</div>
+                              <div class="switch_text off_text">OFF</div>
+                        </span>
+                        <script>
+                              getSettingsValues();
+                        </script>
+                  </label>
+            </div>
+            <p>FPS:</p>
+            <div id="FPSslider">
+                  <div id="handle" class="ui-slider-handle"></div>
+            </div>
+            <br>
+
+            <button class="settings_button dialog_button " onclick="updateSettings()">Save Settings</button>
+            <br>
+            <button class="settings_button dialog_button" style="width:50%" onclick="hideSettings()">Exit</button>
+
+      </div>
+      <!-- End of settings view -->
+
+      <!-- about view -->
+      <div id="about" class="menuPopup destroy">
+            <div id="aboutExit" style="top: auto; position: fixed; z-index: 3000">
+                  <button class="settings_button dialog_button" style="width:50px" onclick="hideAbout()">X</button>
+            </div>
+            <br>
+
+
+            <div style="font-family:destroyregular;font-size:40px;text-align:center;position:relative">
+                  About
+            </div>
+            <div style="font-family:Arial;font-size:20px">
+                  On a quiet unassuming day, Floyd was jolted awake by his entire room shaking viciously. Jumping out of his bed and running
+                  to his window, he sees the town castle in ruins. This is troubling because this very castle is where his
+                  best friend was wrongfully imprisoned just a few days earlier. Floyd heads to the castle to save his friend
+                  and so begins our story.
+
+            </div>
+            <br>
+            <br>
+            <div style="font-family:destroyregular;font-size:40px;text-align:center;position:relative">
+                  Controls
+            </div>
+            <div style="font-family:Arial;font-size:20px">
+                  <p>Switch characters:
+                        <img src="assets\menuImages\computer_key_Q.png" height="25">
+                        <img src="assets\menuImages\computer_key_E.png" height="25">
+                  </p>
+                  <p>Move left/right:
+                        <img src="assets\menuImages\computer_key_A.png" height="25">
+                        <img src="assets\menuImages\computer_key_D.png" height="25"> or
+                        <img src="assets\menuImages\computer_key_Arrow_Left.png" height="25">
+                        <img src="assets\menuImages\computer_key_Arrow_Right.png" height="25">
+                  </p>
+                  <p>Jump:
+                        <img src="assets\menuImages\computer_key_W.png" height="25"> or
+                        <img src="assets\menuImages\computer_key_Arrow_Up.png" height="25">
+                  </p>
+                  <p>Activate ability:
+                        <img src="assets\menuImages\computer_key_Space_bar.png" height="25">
+                  </p>
+                  <p>In-game Menu:
+                        <img src="assets\menuImages\computer_key_M.png" height="25">
+                  </p>
+                  <p>Help Menu:
+                        <img src="assets\menuImages\computer_key_F1.png" height="25">
+                  </p>
+                  
+            </div>
+
+            <div style="font-family:destroyregular;font-size:40px;text-align:center;position:relative">
+                  Characters
+            </div>
+
+            <div style="text-align: center; font-family:Arial;font-size:20px">
+                  <img src="assets\menuImages\fighter-icon.png" height="50">
+                  <br>
+                  <b>Floyd the fighter</b>
+            </div>
+            <br>
+            <div style="font-family:Arial;font-size:20px">
+                  Before the castle partially became ruins, Floyd was concerned that his friend had been taken to the dungeon of the castle.
+                  With the intention of visiting his friend that day, he unexpectedly has to use his fighting skill in the
+                  ruins to help the party kill anything that stands in their way.
+                  <br>
+                  <b>Ability</b>: damages enemies by jumping on top of them
+            </div>
+            <br>
+            <hr>
+            <br>
+
+
+            <div style="text-align: center; font-family:Arial;font-size:20px">
+                  <img src="assets\menuImages\ninja-icon.png" height="50">
+                  <br>
+                  <b>Nate the ninja</b>
+            </div>
+            <br>
+            <div style="font-family:Arial;font-size:20px">
+                  Nate was sought out by the crown to use to further the causes of the monarchy. When he refused, the crown took his wife (Anna,
+                  see below) captive to try to force the issue. Nate was in the middle of searching the castle when it started
+                  to crumble and he was trapped by a falling pillar.
+                  <br>
+                  <b>Ability:</b> Can use 2 jumps instead of one.
+            </div>
+            <br>
+            <hr>
+            <br>
+
+            <div style="text-align: center; font-family:Arial;font-size:20px">
+                  <img src="assets\menuImages\archer-icon.png" height="50">
+                  <br>
+                  <b>Anna the archer</b>
+            </div>
+            <br>
+            <div style="font-family:Arial;font-size:20px">
+                  Anna was captured by the monarchy in order to try to force her husband to help them. They didn't know that she had any special
+                  ability and thus she was locked away until Nate agreed to be subservient to the crown.
+                  <br>
+                  <b>Ability:</b> able to shoot arrows at range using space
+            </div>
+            <br>
+            <hr>
+            <br>
+
+
+            <div style="text-align: center; font-family:Arial;font-size:20px">
+                  <img src="assets\menuImages\digger-icon.png" height="50">
+                  <br>
+                  <b>Dave the digger</b>
+            </div>
+            <br>
+            <div style="font-family:Arial;font-size:20px">
+                  The party comes across Dave in the middle of the ruins while he is looking for artifacts. He is a quirky character who doesn't
+                  seem to care about the conflict of the main story but rather cares about collecting trinkets and old objects
+                  from history. He agrees to help the party not because it is the right thing to do, but because he believes
+                  it to be the best path to lead him to the most artifacts.
+                  <br>
+                  <b>Ability:</b> able to dig through dirt/grass blocks by pressing space
+            </div>
+            <br>
+            <hr>
+            <br>
+
+
+            <div style="text-align: center; font-family:Arial;font-size:20px">
+                  <img src="assets\menuImages\swimmer-icon.png" height="50">
+                  <br>
+                  <b>Sam the swimmer</b>
+            </div>
+            <br>
+            <div style="font-family:Arial;font-size:20px">
+                  Sam is the last character that is found in the castle and was previously an employee of the crown. After witnessing
+                  the terrible things the crown has done, he is more than willing to join the party to help find their friend
+                  and also bring justice to the crown by any means necessary.
+                  <br>
+                  <b>Ability:</b> moves at normal speed and takes no damage in water
+            </div>
+            <br>
+            <hr>
+            <br>
+
+
+            
+            <div style="font-family:destroyregular;font-size:40px;text-align:center;position:relative">
+                  Level Completion
+            </div>
+            <br>
+
+
+            <div style="text-align: center; font-family:Arial;font-size:20px">
+                  <img src="assets\menuImages\torch-icon.png" height="50">
+                  <br> Collect this torch to complete each level.
+            </div>
+            <br>
+
+            <br>
+            <button class="settings_button dialog_button" style="width:50%" onclick="hideAbout()">Exit</button>
+      </div>
+      <!-- End of about view -->
+
+
+      <!-- account view -->
+      <div id="actSettings" class="menuPopup">
+            <div style="font-family:destroyregular;font-size:40px;text-align:center;">Account Settings</div>
+            <div id="actOptions">
+<!--                  <button id="viewAchievements" class="dialog_button" onclick="viewAchievements()">View Stats/Achievements</button>
+                  <br>
+-->                  <div id="message_actSettings">.</div>
+                  <button id="changePwd" class="dialog_button" onclick="changePwdView()">Change Password</button>
+                  <table id="changePasswordTable">
+                        <tr><td><b>Old Password: </b></td></tr>
+                        <tr><td><input type="password" id="oldPwd" placeholder="Old Password"></td></tr>
+                        <tr><td><b>New Password: </b></td></tr>
+                        <tr><td><input type="password" id="newPwd" placeholder="New Password"></td></tr>
+                        <tr><td><b>Confirm New Password: </b></td></tr>
+                        <tr><td><input type="password" id="confirmPwd" placeholder="Confirm Password"></td></tr>
+                        <tr><td><button id="changePassword" class="dialog_button" style="width:100%" onclick="changePwd()">Change Password</button></td></tr>
+                  </table>
+                  <br>
+                  <button id="deleteAcc" class="dialog_button" onclick="deleteAccount()">Delete Account</button>
+                  <br>
+                  <button id="logout" class="dialog_button" onclick="logout()">Logout</button>
+                  <br>
+                  <button id="actSettingsExitButton" class="dialog_button" style="width:50%" onclick="backToMain()">Exit</button>
+            </div>
+      </div>
+      <!-- End of account view -->
+
+      <!-- Select Campaign Level-->
+      <div id="selectLevel" class="menuPopup selctLevel destroy">
+            <div class="titleBar">
+                  <button class="dialog_button" style="float:left;width:10%;" onclick="backToMain()">Exit</button>
+                  <button id="toggleMyLevelsButton" class="dialog_button" style="float:right;width:10%;" onclick="toggleMyLevels()"></button>
+                  <button id="refreshMyLevels" class="dialog_button" onclick="refreshMyLevels()"></button>
+            </div>
+            <!-- Titles -->
+            <div id="campaignTitle" class="destroy">Campaign</div>
+            <div id="myLevelsTitle" class="destroy">My Levels</div>
+            <div id="otherLevelsTitle" class="destroy">Other Levels</div>
+            <div id="noLevelsToDisplay" style="display:none;">
+                  <div id="noMyLevels">
+                        There are no levels to display!
+                        <br>
+                        <br> You can create a level by visiting the level editor or by returning to the main menu and loading
+                        them from your computer.
+                  </div>
+                  <div id="noOtherLevels">
+                        There are no levels to display!
+                        <br>
+                        <br> You need to be signed in to load levels created by other players.
+                  </div>
+
+            </div>
+            <!-- Main content of selectLevel Page -->
+            <div id="selectLevelContent" oncontextmenu="return false">
+                  <div id="campaignView" class="vertical_menu">
+                        <!-- List of all campaign levels, shown in buttons -->
+                  </div>
+                  <div id="myLevelView" class="vertical_menu" oncontextmenu="return false">
+                        <input type="text" id="myInput" class="myInput" onkeyup="checkList()" placeholder="Search for a level.." title="Type in a level ID">
+                        <!--List of levels will go here, created by js function-->
+                  </div>
+                  <div style="display:none;" id="otherLevelView" class="vertical_menu">
+                        <input type="text" id="myInput1" class="myInput" onkeyup="checkList()" placeholder="Search for a level.." title="Type in a level ID">
+                        <!--List of levels will go here, created by js function-->
+                  </div>
+            </div>
+
+            <div id="levelStats">
+                  <div id="levelStatsDisplay"></div>
+                  <div id="pulsingPlayButton" class="pulsing-button">
+                        <span onclick="playButtonClicked()" class="pulse-play-button">play</span>
+                  </div>
+                  <div id="pulsingEditButton" class="pulsing-button">
+                        <span onclick="editLevelFromSelectMenu()" class="pulse-edit-button">edit</span>
+                  </div>
+            </div>
+      </div>
+      </div>
+      <!-- end of view -->
+
+      <!-- level editor view -->
+      <div id="levelEditorContent">
+            <div id="level_editor">
+                  <div id="top_menu_space"></div>
+                  <div id="menu">
+                        <div id="menu_button" onclick="openMenuDialog()">Menu</div>
+                        <div id="droppable_remove">
+                              <img src="assets/gameImages/recycleBin2.jpg" height=75>
+                        </div>
+                        <div id="top_menu_zoom" class="top_menu">
+                              <br>
+                              <br> Zoom in to edit level
+                        </div>
+                        <div id="top_menu" class="top_menu">
+                              <div style="float:left">
+                                    <table>
+                                          <tr>
+                                                <td>
+                                                      <div id="terrain_main_entity" class="main_entity" onclick="showEntityMenu('terrain')"></div>
+                                                </td>
+                                                <td>
+                                                      <div id="enemy_main_entity" class="main_entity" onclick="showEntityMenu('enemy')"></div>
+                                                </td>
+                                                <td>
+                                                      <div id="item_main_entity" class="main_entity" onclick="showEntityMenu('item')"></div>
+                                                </td>
+                                          </tr>
+                                    </table>
+                              </div>
+                              <div style="float:right">
+                                    <table>
+                                          <tr>
+                                                <td>
+                                                      <div id="character_main_entity" class="main_entity" onclick="showEntityMenu('character')"></div>
+                                                </td>
+                                                <td>
+                                                      <div id="background_main_entity" class="main_entity" onclick="showEntityMenu('background')"></div>
+                                                </td>
+                                                <td>
+                                                      <div id="sound_main_entity" class="main_entity" onclick="showEntityMenu('sound')"></div>
+                                                </td>
+                                          </tr>
+                                    </table>
+                              </div>
+                        </div>
+                  </div>
+                  <div id="new_background_outer_div">
+                        <div id="new_background_div"></div>
+                  </div>
+                  <div id="background_div">
+                        <div id="droppable_grid"></div>
+                        <div id="graphicChoiceDiv"></div>
+                  </div>
+
+                  <!-- the following are the entity menus -->
+                  <div id="background_menu" class="entity_menu">
+                        <div class="menu_header">Background</div>
+                        <div>
+                              <img id="colorWheelCheckbox" src="assets/gameImages/checkmark.png" class="backgroundCheckbox">
+                              <input type="color" id="colorWheelInput" style="display:none">
+                              <img id="colorWheel" src="assets/Backgrounds/colorWheel.png" class="check_entity background_entity">
+                              </input>
+                        </div>
+                  </div>
+                  <div id="character_menu" class="entity_menu">
+                        <div class="menu_header">Character</div>
+                  </div>
+                  <div id="enemy_menu" class="entity_menu">
+                        <div class="menu_header">Enemy</div>
+                  </div>
+                  <div id="item_menu" class="entity_menu">
+                        <div class="menu_header">Item</div>
+                  </div>
+                  <div id="sound_menu" class="entity_menu">
+                        <div class="menu_header">Sound</div>
+                  </div>
+                  <div id="terrain_menu" class="entity_menu">
+                        <div class="menu_header">Terrain</div>
+                  </div>
+            </div>
+            <div id="editor_menu_dialog" class="dialog_menu">
+                  <div id="message_editor"></div>
+                  <button id="load_lvl_button" class="dialog_button" onclick="displayLoadEditorInput()">Load Level</button>
+                  <br>
+                  <!-- <button id="chooseFileButton" class="dialog_button" onclick="$('#levelsFromFile').click();">Load From File</button>
+                  <br> -->
+                  <button id="save_lvl_button" class="dialog_button" onclick="displaySaveEditorInput()">Save Level</button>
+                  <input type="text" id="save_lvl_textbox" placeholder="Level Name">
+                  <button id="save_button" class="dialog_button" onclick="saveEditorLevel()">Save</button>
+                  <br>
+
+                  <button class="dialog_button" onclick="testEditorLevel()">Test Level</button>
+                  <br>
+                  <button class="dialog_button" onclick="clearLevelEditor()">Clear Editor</button>
+                  <br>
+                  <button class="dialog_button" onclick="backToMain()">Exit Editor</button>
+
+            </div>
+            <div id="zoom_dialog"></div>
+      </div>
+      <!-- End of level editor view -->
+
+      <!-- Debug Menu-->
+      <div id="debug" class="menuPopup debug" style="display:none;">
+            <div style="font-family:destroyregular;font-size:40px;text-align:center;">Debug</div>
+            <div id="unlimitedHealth" class="destroy" style="font-size:20px;">
+                  <div style="vertical-align: middle;display:inline-block;height:100%;">Unlimited Health</div>
+                  <label class="switch">
+                        <input type="checkbox" id="unlimitedHealthBox">
+                        <span class="slider">
+                              <div class="switch_text on_text">ON</div>
+                              <div class="switch_text off_text">OFF</div>
+                        </span>
+                  </label>
+            </div>
+            <div id="unlimitedAmmo" class="destroy" style="font-size:20px;">
+                  <div style="vertical-align: middle;display:inline-block;height:100%;">Unlimited Ammo</div>
+                  <label class="switch">
+                        <input type="checkbox" id="unlimitedAmmoBox">
+                        <span class="slider">
+                              <div class="switch_text on_text">ON</div>
+                              <div class="switch_text off_text">OFF</div>
+                        </span>
+                  </label>
+            </div>
+            <div id="unlockCharactersDiv" class="destroy" style="font-size:20px;">
+                  <div style="vertical-align: middle;display:inline-block;height:100%;">Unlock Characters</div>
+                  <label class="switch">
+                        <input type="checkbox" id="unlockCharactersBox">
+                        <span class="slider">
+                              <div class="switch_text on_text">ON</div>
+                              <div class="switch_text off_text">OFF</div>
+                        </span>
+                  </label>
+            </div>
+            <br>
+
+            <button class="settings_button dialog_button " onclick="updateDebugVals()">Apply</button>
+            <br>
+            <button class="settings_button dialog_button" style="width:50%" onclick="closeDebug()">Exit</button>
+            <br>
+            <button id="otherDebugButton" style="display:none; width:25%" class="settings_button dialog_button" onclick="debugOther()">Admin</button>
+      </div>
+
+      <!-- This is the admin control menu -->
+      <div id="campaignEdit" class="debug">
+            <div id="adminPasswordField" class="adminLogin" style="width:50%">
+                  Admin Password:
+                  <input type="password" id="adminPassword">
+            </div>
+            <br>
+            <button id="adminLogin" style="width:50%" class=" adminLogin settings_button dialog_button" onclick="validateAdmin()">Login</button>
+            <p class="saveCampaignLevels destroy" style="text-align:center;font-size:20px">Admin</p>
+            <p class="saveCampaignLevels">Save this level as
+                  <select id="selectCampaignLevel" class="adminLogin saveCampaignLevels"></select>
+                  <button onclick="saveCampaignLocal(currentLevel)">Save</button>
+            </p>
+            <br>
+            <br>
+            <button id="downloadCampaign" class="settings_button dialog_button saveCampaignLevels" onclick="downloadCampaign()">Download Campaign to File</button>
+            <button id="uploadCampaign" class="settings_button dialog_button saveCampaignLevels" onclick="uploadCampaign()">Upload new campiagn to DB</button>
+      </div>
+
+</body>
+
+
+</html>

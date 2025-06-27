@@ -1,0 +1,24 @@
+- Username length 4 to 8, Password length 6 to 16
+- campaign IDs are campaign1-campaign20
+
+
+
+How to save campaign levels permanetely:
+
+MUST BE IN OFFLINE MODE!!!!!!!!!!
+
+1) Create Level in editor
+2) Open debug (in game or editor only)
+3) Choose "Admin"
+4) Enter admin password "admin"
+5) Choose Level you wish to save currentLevel as
+6) Click save
+7) When done, before you exit the game you need to download the new .JSON file and overwrite campaign/campaignLevels.json
+8) Run this code from the main directory:
+      **Note** 
+      You may need to install browserify first by running:    
+            npm i broswerify
+      else (Run this):    
+            browserify client/js/jsonReadWrite.js -o client/js/jsonReadWrite-bundled.js                                              
+
+9) New campaign levels will be read in automatically on load

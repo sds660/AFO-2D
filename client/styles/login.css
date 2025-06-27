@@ -1,0 +1,48 @@
+#canvas {
+    display: none;
+}
+#confirmPassword, #securityQuestion, #securityAnswer, #createAccount, #resetAccount, #backToLogin {
+    display: none;
+}
+
+#login_div {
+    position: absolute; /* Sit on top of the page content */
+    width: 1280px; /* Full width (cover the whole page) */
+    height: 720px; /* Full height (cover the whole page) */
+    background-image: url("../assets/menuImages/menuBackground.jpg"); /* Black background with opacity */
+    z-index: 3; /* Specify a stack order in case you're using a different order for other elements */
+}
+
+#header {
+    height: 200px;
+    background-image: url("../assets/menuImages/AFO.png");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#login_form {
+    text-align: center;
+}
+
+#login_table {
+    background-color: rgba(238, 238, 238, .8);
+    border: solid rgba(238, 238, 238, .8);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 0 auto;
+}
+
+#login_table button{
+    padding:    5px;
+}
+
+#actSettingsTable button{
+    width: 80%;
+    padding: 10px;
+    border-radius: 10px;
+    border-width: 4px;
+}
+
+#message_div {
+    color:  red;
+}
